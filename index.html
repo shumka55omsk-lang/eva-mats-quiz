@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Квиз подбора EVA ковриков по автомобилю</title>
+<meta name="description" content="Пошаговый квиз для подбора EVA ковриков: марка, модель, год, поколение, борта, багажник и подпятник.">
+<style>
+:root{
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#667085;
+  --line:#e5e7eb;
+  --accent:#e11d48;
+  --accent2:#111827;
+  --soft:#fff1f2;
+  --success:#16a34a;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,Arial,sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(225,29,72,.12), transparent 34%),
+    linear-gradient(180deg,#ffffff 0%,var(--bg) 100%);
+  color:var(--text);
+  min-height:100vh;
+}
+.wrapper{
+  max-width:1060px;
+  margin:0 auto;
+  padding:28px 16px 56px;
+}
+.hero{
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:22px;
+  align-items:stretch;
+  margin-bottom:18px;
+}
+.hero-card,.quiz-card,.result-card{
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(229,231,235,.9);
+  box-shadow:0 20px 60px rgba(15,23,42,.08);
+  border-radius:28px;
+}
+.hero-card{
+  padding:30px;
+}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:var(--soft);
+  color:var(--accent);
+  font-weight:700;
+  font-size:14px;
+}
+h1{
+  margin:18px 0 10px;
+  font-size:clamp(30px,5vw,54px);
+  line-height:1.02;
+  letter-spacing:-.04em;
+}
+.hero p{
+  margin:0;
+  font-size:17px;
+  line-height:1.55;
+  color:var(--muted);
+}
+.hero-side{
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-height:260px;
+  overflow:hidden;
+  position:relative;
+}
+.hero-side:before{
+  content:"";
+  position:absolute;
+  inset:auto -50px -80px auto;
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  background:rgba(225,29,72,.13);
+}
+.stats{
+  display:grid;
+  gap:12px;
+  position:relative;
+}
+.stat{
+  padding:16px;
+  border-radius:20px;
+  background:#f9fafb;
+  border:1px solid var(--line);
+}
+.stat strong{display:block;font-size:26px;line-height:1}
+.stat span{display:block;margin-top:6px;color:var(--muted);font-size:14px}
+.quiz-card{
+  padding:24px;
+}
+.topline{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:18px;
+}
+.step-title{
+  margin:0;
+  font-size:26px;
+  letter-spacing:-.02em;
+}
+.step-subtitle{
+  margin:7px 0 0;
+  color:var(--muted);
+  line-height:1.45;
+}
+.progress-wrap{
+  min-width:220px;
+  text-align:right;
+}
+.progress-text{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:8px;
+}
+.progress{
+  width:100%;
+  height:10px;
+  background:#edf0f5;
+  border-radius:999px;
+  overflow:hidden;
+}
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--accent),#fb7185);
+  border-radius:999px;
+  transition:.25s ease;
+}
+.search{
+  display:flex;
+  gap:10px;
+  margin:18px 0 14px;
+}
+.search input,.field input,.field select,textarea{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px 15px;
+  font-size:16px;
+  outline:none;
+  background:#fff;
+  transition:.2s;
+}
+.search input:focus,.field input:focus,.field select:focus,textarea:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 4px rgba(225,29,72,.09);
+}
+.options{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin-top:14px;
+  max-height:440px;
+  overflow:auto;
+  padding-right:4px;
+}
+.option{
+  cursor:pointer;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:18px;
+  padding:16px;
+  min-height:80px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  transition:.16s ease;
+}
+.option:hover{
+  transform:translateY(-1px);
+  border-color:#fda4af;
+  box-shadow:0 10px 26px rgba(15,23,42,.07);
+}
+.option.active{
+  border-color:var(--accent);
+  background:var(--soft);
+  box-shadow:0 10px 24px rgba(225,29,72,.08);
+}
+.option strong{
+  font-size:16px;
+  line-height:1.25;
+}
+.option span{
+  margin-top:6px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.35;
+}
+.option.big{
+  min-height:118px;
+}
+.nav{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:22px;
+}
+button,.btn{
+  appearance:none;
+  border:0;
+  cursor:pointer;
+  border-radius:16px;
+  padding:14px 20px;
+  font-size:16px;
+  font-weight:800;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  transition:.18s ease;
+}
+.btn-secondary{
+  background:#f3f4f6;
+  color:#111827;
+}
+.btn-secondary:hover{background:#e5e7eb}
+.btn-primary{
+  background:var(--accent);
+  color:#fff;
+  box-shadow:0 12px 24px rgba(225,29,72,.22);
+}
+.btn-primary:hover{
+  transform:translateY(-1px);
+  background:#be123c;
+}
+.btn-primary:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none;
+}
+.hint{
+  margin-top:12px;
+  color:var(--muted);
+  font-size:14px;
+}
+.result-card{
+  margin-top:18px;
+  padding:24px;
+  display:none;
+}
+.result-card.show{display:block}
+.summary{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin:18px 0;
+}
+.summary-item{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#fbfcfe;
+  padding:14px;
+}
+.summary-item span{
+  display:block;
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+.summary-item strong{
+  font-size:16px;
+  line-height:1.35;
+}
+.lead-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:12px;
+}
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:800;
+  margin:0 0 7px;
+}
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+
+.send-status{
+  display:none;
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:14px;
+  font-size:14px;
+  line-height:1.45;
+  border:1px solid var(--line);
+  background:#f9fafb;
+}
+.send-status.show{display:block}
+.send-status.ok{
+  background:#ecfdf5;
+  border-color:#bbf7d0;
+  color:#166534;
+}
+.send-status.error{
+  background:#fff1f2;
+  border-color:#fecdd3;
+  color:#9f1239;
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:20px;
+  transform:translateX(-50%) translateY(30px);
+  background:#111827;
+  color:#fff;
+  padding:12px 16px;
+  border-radius:999px;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  z-index:20;
+}
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+.empty{
+  padding:22px;
+  border:1px dashed #cbd5e1;
+  border-radius:18px;
+  color:var(--muted);
+  background:#fafafa;
+}
+@media(max-width:820px){
+  .hero{grid-template-columns:1fr}
+  .hero-card,.quiz-card,.result-card{border-radius:22px}
+  .topline{align-items:flex-start;flex-direction:column}
+  .progress-wrap{width:100%;text-align:left}
+  .options{grid-template-columns:repeat(2,minmax(0,1fr));max-height:430px}
+  .summary,.lead-grid{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .wrapper{padding:16px 10px 38px}
+  .hero-card,.quiz-card,.result-card{padding:18px}
+  .options{grid-template-columns:1fr}
+  .nav{position:sticky;bottom:0;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);padding-top:10px;z-index:5}
+  button,.btn{width:100%}
+  .actions{display:grid}
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <section class="hero">
+    <div class="hero-card">
+      <div class="badge">🚗 Подбор EVA ковриков</div>
+      <h1>Квиз подбора ковриков по автомобилю</h1>
+      <p>Клиент выбирает марку, модель, год, поколение и комплектацию ковриков. В конце формируется готовая заявка для менеджера.</p>
+    </div>
+    <div class="hero-card hero-side">
+      <div class="stats">
+        <div class="stat"><strong id="brandCount">—</strong><span>марок в базе</span></div>
+        <div class="stat"><strong id="modelCount">—</strong><span>моделей в базе</span></div>
+        <div class="stat"><strong id="generationCount">—</strong><span>поколений в базе</span></div>
+      </div>
+      <p class="hint">База встроена из Excel-файла. Работает без сервера.</p>
+    </div>
+  </section>
+
+  <section class="quiz-card">
+    <div class="topline">
+      <div>
+        <h2 class="step-title" id="stepTitle"></h2>
+        <p class="step-subtitle" id="stepSubtitle"></p>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-text" id="progressText"></div>
+        <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+      </div>
+    </div>
+    <div id="quizBody"></div>
+    <div class="nav">
+      <button class="btn-secondary" id="backBtn">← Назад</button>
+      <button class="btn-primary" id="nextBtn">Далее →</button>
+    </div>
+  </section>
+
+  <section class="result-card" id="resultCard">
+    <h2 class="step-title">Готовая заявка</h2>
+    <p class="step-subtitle">Скопируйте заявку или добавьте данные клиента.</p>
+    <div class="summary" id="summary"></div>
+
+    <div class="lead-grid">
+      <div class="field">
+        <label for="clientName">Имя клиента</label>
+        <input id="clientName" placeholder="Например: Иван">
+      </div>
+      <div class="field">
+        <label for="clientPhone">Телефон</label>
+        <input id="clientPhone" placeholder="+7 ___ ___-__-__">
+      </div>
+      <div class="field">
+        <label for="clientMessenger">Куда ответить</label>
+        <select id="clientMessenger">
+          <option>WhatsApp</option>
+          <option>Telegram</option>
+          <option>MAX</option>
+          <option>Позвонить</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:12px">
+      <label for="comment">Комментарий</label>
+      <textarea id="comment" rows="3" placeholder="Например: цвет соты, адрес, срочность, особенности салона"></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" id="sendTelegramBtn">Отправить заявку</button>
+      <button class="btn-secondary" id="copyBtn">Скопировать заявку</button>
+      <button class="btn-secondary" id="restartBtn">Начать заново</button>
+    </div>
+    <div class="send-status" id="sendStatus"></div>
+    <p class="hint">Заявка отправляется через /api/send-telegram. Токен бота хранится в переменных окружения Vercel, а не в коде сайта.</p>
+  </section>
+</div>
+<div class="toast" id="toast">Скопировано</div>
+
+<script>
+const CARS = [{"id":1,"brand":"Audi","model":"A3","generation":"8P / 2 поколение","years":"2003–2013","start":2003,"end":2013,"body":"седан / хэтчбек","segment":"C-класс"},{"id":2,"brand":"Audi","model":"A3","generation":"8V / 3 поколение","years":"2012–2020","start":2012,"end":2020,"body":"седан / хэтчбек","segment":"C-класс"},{"id":3,"brand":"Audi","model":"A3","generation":"8Y / 4 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"седан / хэтчбек","segment":"C-класс"},{"id":4,"brand":"Audi","model":"A4","generation":"B7","years":"2004–2008","start":2004,"end":2008,"body":"седан / универсал","segment":"D-класс"},{"id":5,"brand":"Audi","model":"A4","generation":"B8","years":"2007–2015","start":2007,"end":2015,"body":"седан / универсал","segment":"D-класс"},{"id":6,"brand":"Audi","model":"A4","generation":"B9","years":"2015–2024","start":2015,"end":2024,"body":"седан / универсал","segment":"D-класс"},{"id":7,"brand":"Audi","model":"A6","generation":"C6","years":"2004–2011","start":2004,"end":2011,"body":"седан / универсал","segment":"E-класс"},{"id":8,"brand":"Audi","model":"A6","generation":"C7","years":"2011–2018","start":2011,"end":2018,"body":"седан / универсал","segment":"E-класс"},{"id":9,"brand":"Audi","model":"A6","generation":"C8","years":"2018–н.в.","start":2018,"end":null,"body":"седан / универсал","segment":"E-класс"},{"id":10,"brand":"Audi","model":"Q3","generation":"8U / 1 поколение","years":"2011–2018","start":2011,"end":2018,"body":"кроссовер","segment":"SUV"},{"id":11,"brand":"Audi","model":"Q3","generation":"F3 / 2 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"кроссовер","segment":"SUV"},{"id":12,"brand":"Audi","model":"Q5","generation":"8R / 1 поколение","years":"2008–2017","start":2008,"end":2017,"body":"кроссовер","segment":"SUV"},{"id":13,"brand":"Audi","model":"Q5","generation":"FY / 2 поколение","years":"2017–2024","start":2017,"end":2024,"body":"кроссовер","segment":"SUV"},{"id":14,"brand":"Audi","model":"Q5","generation":"GU / 3 поколение","years":"2024–н.в.","start":2024,"end":null,"body":"кроссовер","segment":"SUV"},{"id":15,"brand":"Audi","model":"Q7","generation":"4L / 1 поколение","years":"2005–2015","start":2005,"end":2015,"body":"кроссовер","segment":"SUV"},{"id":16,"brand":"Audi","model":"Q7","generation":"4M / 2 поколение","years":"2015–н.в.","start":2015,"end":null,"body":"кроссовер","segment":"SUV"},{"id":17,"brand":"BMW","model":"3 Series","generation":"E90 / E91 / E92 / E93","years":"2005–2013","start":2005,"end":2013,"body":"седан / универсал","segment":"D-класс"},{"id":18,"brand":"BMW","model":"3 Series","generation":"F30 / F31 / F34","years":"2011–2019","start":2011,"end":2019,"body":"седан / универсал","segment":"D-класс"},{"id":19,"brand":"BMW","model":"3 Series","generation":"G20 / G21","years":"2018–н.в.","start":2018,"end":null,"body":"седан / универсал","segment":"D-класс"},{"id":20,"brand":"BMW","model":"5 Series","generation":"E60 / E61","years":"2003–2010","start":2003,"end":2010,"body":"седан / универсал","segment":"E-класс"},{"id":21,"brand":"BMW","model":"5 Series","generation":"F10 / F11","years":"2010–2017","start":2010,"end":2017,"body":"седан / универсал","segment":"E-класс"},{"id":22,"brand":"BMW","model":"5 Series","generation":"G30 / G31","years":"2017–2023","start":2017,"end":2023,"body":"седан / универсал","segment":"E-класс"},{"id":23,"brand":"BMW","model":"5 Series","generation":"G60 / G61","years":"2023–н.в.","start":2023,"end":null,"body":"седан / универсал","segment":"E-класс"},{"id":24,"brand":"BMW","model":"X3","generation":"E83","years":"2003–2010","start":2003,"end":2010,"body":"кроссовер","segment":"SUV"},{"id":25,"brand":"BMW","model":"X3","generation":"F25","years":"2010–2017","start":2010,"end":2017,"body":"кроссовер","segment":"SUV"},{"id":26,"brand":"BMW","model":"X3","generation":"G01","years":"2017–н.в.","start":2017,"end":null,"body":"кроссовер","segment":"SUV"},{"id":27,"brand":"BMW","model":"X5","generation":"E70","years":"2006–2013","start":2006,"end":2013,"body":"кроссовер","segment":"SUV"},{"id":28,"brand":"BMW","model":"X5","generation":"F15","years":"2013–2018","start":2013,"end":2018,"body":"кроссовер","segment":"SUV"},{"id":29,"brand":"BMW","model":"X5","generation":"G05","years":"2018–н.в.","start":2018,"end":null,"body":"кроссовер","segment":"SUV"},{"id":30,"brand":"BMW","model":"X6","generation":"E71","years":"2008–2014","start":2008,"end":2014,"body":"кроссовер","segment":"SUV"},{"id":31,"brand":"BMW","model":"X6","generation":"F16","years":"2014–2019","start":2014,"end":2019,"body":"кроссовер","segment":"SUV"},{"id":32,"brand":"BMW","model":"X6","generation":"G06","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер","segment":"SUV"},{"id":33,"brand":"Changan","model":"CS35 Plus","generation":"1 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"кроссовер","segment":"SUV"},{"id":34,"brand":"Changan","model":"CS55 Plus","generation":"1 поколение","years":"2017–2021","start":2017,"end":2021,"body":"кроссовер","segment":"SUV"},{"id":35,"brand":"Changan","model":"CS55 Plus","generation":"2 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"кроссовер","segment":"SUV"},{"id":36,"brand":"Changan","model":"Lamore","generation":"1 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"седан","segment":"C-класс"},{"id":37,"brand":"Changan","model":"UNI-K","generation":"1 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"кроссовер","segment":"SUV"},{"id":38,"brand":"Changan","model":"UNI-V","generation":"1 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"лифтбек","segment":"D-класс"},{"id":39,"brand":"Chery","model":"Arrizo 8","generation":"1 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"седан","segment":"D-класс"},{"id":40,"brand":"Chery","model":"Tiggo 4","generation":"1 поколение","years":"2017–н.в.","start":2017,"end":null,"body":"кроссовер","segment":"SUV"},{"id":41,"brand":"Chery","model":"Tiggo 7 Pro","generation":"1 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"кроссовер","segment":"SUV"},{"id":42,"brand":"Chery","model":"Tiggo 8","generation":"1 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"кроссовер","segment":"SUV"},{"id":43,"brand":"Chery","model":"Tiggo 8 Pro / Pro Max","generation":"1 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"кроссовер","segment":"SUV"},{"id":44,"brand":"Chevrolet","model":"Aveo","generation":"T250","years":"2005–2011","start":2005,"end":2011,"body":"седан / хэтчбек","segment":"B-класс"},{"id":45,"brand":"Chevrolet","model":"Aveo","generation":"T300","years":"2011–2020","start":2011,"end":2020,"body":"седан / хэтчбек","segment":"B-класс"},{"id":46,"brand":"Chevrolet","model":"Captiva","generation":"C100","years":"2006–2011","start":2006,"end":2011,"body":"кроссовер","segment":"SUV"},{"id":47,"brand":"Chevrolet","model":"Captiva","generation":"C140","years":"2011–2018","start":2011,"end":2018,"body":"кроссовер","segment":"SUV"},{"id":48,"brand":"Chevrolet","model":"Cobalt","generation":"T250 / 2 поколение","years":"2011–н.в.","start":2011,"end":null,"body":"седан","segment":"B-класс"},{"id":49,"brand":"Chevrolet","model":"Cruze","generation":"J300","years":"2008–2016","start":2008,"end":2016,"body":"седан / хэтчбек","segment":"C-класс"},{"id":50,"brand":"Chevrolet","model":"Cruze","generation":"J400","years":"2015–2020","start":2015,"end":2020,"body":"седан / хэтчбек","segment":"C-класс"},{"id":51,"brand":"Chevrolet","model":"Lacetti","generation":"J200","years":"2002–2013","start":2002,"end":2013,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":52,"brand":"Chevrolet","model":"Niva","generation":"ВАЗ-2123 / Chevrolet Niva","years":"2002–2020","start":2002,"end":2020,"body":"внедорожник","segment":"SUV"},{"id":53,"brand":"Citroën","model":"Berlingo","generation":"2 поколение","years":"2008–2018","start":2008,"end":2018,"body":"минивэн / фургон","segment":"MPV"},{"id":54,"brand":"Citroën","model":"Berlingo","generation":"3 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"минивэн / фургон","segment":"MPV"},{"id":55,"brand":"Citroën","model":"C4","generation":"1 поколение","years":"2004–2010","start":2004,"end":2010,"body":"седан / хэтчбек","segment":"C-класс"},{"id":56,"brand":"Citroën","model":"C4","generation":"2 поколение","years":"2010–2018","start":2010,"end":2018,"body":"седан / хэтчбек","segment":"C-класс"},{"id":57,"brand":"Citroën","model":"C4","generation":"C4 Sedan","years":"2012–н.в.","start":2012,"end":null,"body":"седан / хэтчбек","segment":"C-класс"},{"id":58,"brand":"Citroën","model":"C5 Aircross","generation":"1 поколение","years":"2017–н.в.","start":2017,"end":null,"body":"кроссовер","segment":"SUV"},{"id":59,"brand":"Exeed","model":"LX","generation":"1 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер","segment":"SUV"},{"id":60,"brand":"Exeed","model":"RX","generation":"1 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"кроссовер","segment":"SUV"},{"id":61,"brand":"Exeed","model":"TXL","generation":"1 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер","segment":"SUV"},{"id":62,"brand":"Exeed","model":"VX","generation":"1 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"кроссовер","segment":"SUV"},{"id":63,"brand":"Ford","model":"Fiesta","generation":"Mk6","years":"2008–2017","start":2008,"end":2017,"body":"седан / хэтчбек","segment":"B-класс"},{"id":64,"brand":"Ford","model":"Fiesta","generation":"Mk7","years":"2017–2023","start":2017,"end":2023,"body":"седан / хэтчбек","segment":"B-класс"},{"id":65,"brand":"Ford","model":"Focus","generation":"1 поколение","years":"1998–2005","start":1998,"end":2005,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":66,"brand":"Ford","model":"Focus","generation":"2 поколение","years":"2004–2011","start":2004,"end":2011,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":67,"brand":"Ford","model":"Focus","generation":"3 поколение","years":"2011–2019","start":2011,"end":2019,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":68,"brand":"Ford","model":"Focus","generation":"4 поколение","years":"2018–2025","start":2018,"end":2025,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":69,"brand":"Ford","model":"Kuga","generation":"1 поколение","years":"2008–2012","start":2008,"end":2012,"body":"кроссовер","segment":"SUV"},{"id":70,"brand":"Ford","model":"Kuga","generation":"2 поколение","years":"2012–2019","start":2012,"end":2019,"body":"кроссовер","segment":"SUV"},{"id":71,"brand":"Ford","model":"Kuga","generation":"3 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер","segment":"SUV"},{"id":72,"brand":"Ford","model":"Mondeo","generation":"4 поколение","years":"2007–2014","start":2007,"end":2014,"body":"седан / лифтбек / универсал","segment":"D-класс"},{"id":73,"brand":"Ford","model":"Mondeo","generation":"5 поколение","years":"2014–2022","start":2014,"end":2022,"body":"седан / лифтбек / универсал","segment":"D-класс"},{"id":74,"brand":"Ford","model":"Transit","generation":"7 поколение","years":"2006–2014","start":2006,"end":2014,"body":"фургон / микроавтобус","segment":"LCV"},{"id":75,"brand":"Ford","model":"Transit","generation":"8 поколение","years":"2014–н.в.","start":2014,"end":null,"body":"фургон / микроавтобус","segment":"LCV"},{"id":76,"brand":"GWM","model":"KingKong Poer","generation":"1 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"пикап","segment":"Pickup"},{"id":77,"brand":"GWM","model":"Poer","generation":"Pao / Poer","years":"2019–н.в.","start":2019,"end":null,"body":"пикап","segment":"Pickup"},{"id":78,"brand":"GWM","model":"Wingle 7","generation":"1 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"пикап","segment":"Pickup"},{"id":79,"brand":"Geely","model":"Atlas","generation":"NL-3 / 1 поколение","years":"2016–2022","start":2016,"end":2022,"body":"кроссовер","segment":"SUV"},{"id":80,"brand":"Geely","model":"Atlas","generation":"Atlas Pro","years":"2021–н.в.","start":2021,"end":null,"body":"кроссовер","segment":"SUV"},{"id":81,"brand":"Geely","model":"Atlas","generation":"Atlas L","years":"2022–н.в.","start":2022,"end":null,"body":"кроссовер","segment":"SUV"},{"id":82,"brand":"Geely","model":"Coolray","generation":"SX11 / 1 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"кроссовер","segment":"SUV"},{"id":83,"brand":"Geely","model":"Emgrand","generation":"EC7 / 1 поколение","years":"2009–2016","start":2009,"end":2016,"body":"седан","segment":"C-класс"},{"id":84,"brand":"Geely","model":"Emgrand","generation":"SS11 / 4 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"седан","segment":"C-класс"},{"id":85,"brand":"Geely","model":"Monjaro","generation":"KX11 / 1 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"кроссовер","segment":"SUV"},{"id":86,"brand":"Geely","model":"Tugella","generation":"FY11 / 1 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер-купе","segment":"SUV"},{"id":87,"brand":"Great Wall","model":"Hover H3","generation":"1 поколение","years":"2005–2016","start":2005,"end":2016,"body":"внедорожник","segment":"SUV"},{"id":88,"brand":"Great Wall","model":"Hover H5","generation":"1 поколение","years":"2010–2017","start":2010,"end":2017,"body":"внедорожник","segment":"SUV"},{"id":89,"brand":"Haval","model":"Dargo","generation":"1 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"кроссовер","segment":"SUV"},{"id":90,"brand":"Haval","model":"F7","generation":"1 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"кроссовер","segment":"SUV"},{"id":91,"brand":"Haval","model":"F7x","generation":"1 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер-купе","segment":"SUV"},{"id":92,"brand":"Haval","model":"H6","generation":"2 поколение","years":"2017–2021","start":2017,"end":2021,"body":"кроссовер","segment":"SUV"},{"id":93,"brand":"Haval","model":"H6","generation":"3 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"кроссовер","segment":"SUV"},{"id":94,"brand":"Haval","model":"H9","generation":"1 поколение","years":"2014–2021","start":2014,"end":2021,"body":"внедорожник","segment":"SUV"},{"id":95,"brand":"Haval","model":"H9","generation":"2 поколение","years":"2024–н.в.","start":2024,"end":null,"body":"внедорожник","segment":"SUV"},{"id":96,"brand":"Haval","model":"Jolion","generation":"1 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"кроссовер","segment":"SUV"},{"id":97,"brand":"Honda","model":"Accord","generation":"7 поколение","years":"2002–2008","start":2002,"end":2008,"body":"седан","segment":"D-класс"},{"id":98,"brand":"Honda","model":"Accord","generation":"8 поколение","years":"2008–2015","start":2008,"end":2015,"body":"седан","segment":"D-класс"},{"id":99,"brand":"Honda","model":"Accord","generation":"9 поколение","years":"2012–2017","start":2012,"end":2017,"body":"седан","segment":"D-класс"},{"id":100,"brand":"Honda","model":"Accord","generation":"10 поколение","years":"2017–2022","start":2017,"end":2022,"body":"седан","segment":"D-класс"},{"id":101,"brand":"Honda","model":"Accord","generation":"11 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"седан","segment":"D-класс"},{"id":102,"brand":"Honda","model":"CR-V","generation":"RD4 / 2 поколение","years":"2001–2006","start":2001,"end":2006,"body":"кроссовер","segment":"SUV"},{"id":103,"brand":"Honda","model":"CR-V","generation":"RE / 3 поколение","years":"2006–2012","start":2006,"end":2012,"body":"кроссовер","segment":"SUV"},{"id":104,"brand":"Honda","model":"CR-V","generation":"RM / 4 поколение","years":"2011–2016","start":2011,"end":2016,"body":"кроссовер","segment":"SUV"},{"id":105,"brand":"Honda","model":"CR-V","generation":"RW / 5 поколение","years":"2016–2022","start":2016,"end":2022,"body":"кроссовер","segment":"SUV"},{"id":106,"brand":"Honda","model":"CR-V","generation":"RS / 6 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"кроссовер","segment":"SUV"},{"id":107,"brand":"Honda","model":"Civic","generation":"8 поколение","years":"2005–2011","start":2005,"end":2011,"body":"седан / хэтчбек","segment":"C-класс"},{"id":108,"brand":"Honda","model":"Civic","generation":"9 поколение","years":"2011–2016","start":2011,"end":2016,"body":"седан / хэтчбек","segment":"C-класс"},{"id":109,"brand":"Honda","model":"Civic","generation":"10 поколение","years":"2015–2021","start":2015,"end":2021,"body":"седан / хэтчбек","segment":"C-класс"},{"id":110,"brand":"Honda","model":"Civic","generation":"11 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"седан / хэтчбек","segment":"C-класс"},{"id":111,"brand":"Honda","model":"Fit / Jazz","generation":"GE / 2 поколение","years":"2007–2014","start":2007,"end":2014,"body":"хэтчбек","segment":"B-класс"},{"id":112,"brand":"Honda","model":"Fit / Jazz","generation":"GK / 3 поколение","years":"2013–2020","start":2013,"end":2020,"body":"хэтчбек","segment":"B-класс"},{"id":113,"brand":"Honda","model":"Fit / Jazz","generation":"GR / 4 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"хэтчбек","segment":"B-класс"},{"id":114,"brand":"Honda","model":"Pilot","generation":"2 поколение","years":"2008–2015","start":2008,"end":2015,"body":"кроссовер","segment":"SUV"},{"id":115,"brand":"Honda","model":"Pilot","generation":"3 поколение","years":"2015–2022","start":2015,"end":2022,"body":"кроссовер","segment":"SUV"},{"id":116,"brand":"Honda","model":"Pilot","generation":"4 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"кроссовер","segment":"SUV"},{"id":117,"brand":"Hyundai","model":"Accent","generation":"LC","years":"1999–2005","start":1999,"end":2005,"body":"седан / хэтчбек","segment":"B-класс"},{"id":118,"brand":"Hyundai","model":"Accent","generation":"MC","years":"2005–2011","start":2005,"end":2011,"body":"седан / хэтчбек","segment":"B-класс"},{"id":119,"brand":"Hyundai","model":"Accent","generation":"RB / Solaris I","years":"2010–2017","start":2010,"end":2017,"body":"седан / хэтчбек","segment":"B-класс"},{"id":120,"brand":"Hyundai","model":"Creta","generation":"GS / 1 поколение","years":"2016–2021","start":2016,"end":2021,"body":"кроссовер","segment":"SUV"},{"id":121,"brand":"Hyundai","model":"Creta","generation":"SU2 / 2 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"кроссовер","segment":"SUV"},{"id":122,"brand":"Hyundai","model":"Elantra","generation":"HD / 4 поколение","years":"2006–2010","start":2006,"end":2010,"body":"седан","segment":"C-класс"},{"id":123,"brand":"Hyundai","model":"Elantra","generation":"MD / 5 поколение","years":"2010–2016","start":2010,"end":2016,"body":"седан","segment":"C-класс"},{"id":124,"brand":"Hyundai","model":"Elantra","generation":"AD / 6 поколение","years":"2015–2020","start":2015,"end":2020,"body":"седан","segment":"C-класс"},{"id":125,"brand":"Hyundai","model":"Elantra","generation":"CN7 / 7 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"седан","segment":"C-класс"},{"id":126,"brand":"Hyundai","model":"Santa Fe","generation":"CM / 2 поколение","years":"2005–2012","start":2005,"end":2012,"body":"кроссовер","segment":"SUV"},{"id":127,"brand":"Hyundai","model":"Santa Fe","generation":"DM / 3 поколение","years":"2012–2018","start":2012,"end":2018,"body":"кроссовер","segment":"SUV"},{"id":128,"brand":"Hyundai","model":"Santa Fe","generation":"TM / 4 поколение","years":"2018–2023","start":2018,"end":2023,"body":"кроссовер","segment":"SUV"},{"id":129,"brand":"Hyundai","model":"Santa Fe","generation":"MX5 / 5 поколение","years":"2023–н.в.","start":2023,"end":null,"body":"кроссовер","segment":"SUV"},{"id":130,"brand":"Hyundai","model":"Solaris","generation":"1 поколение / RB","years":"2010–2017","start":2010,"end":2017,"body":"седан / хэтчбек","segment":"B-класс"},{"id":131,"brand":"Hyundai","model":"Solaris","generation":"2 поколение / HC","years":"2017–2022","start":2017,"end":2022,"body":"седан / хэтчбек","segment":"B-класс"},{"id":132,"brand":"Hyundai","model":"Sonata","generation":"NF / 5 поколение","years":"2004–2010","start":2004,"end":2010,"body":"седан","segment":"D-класс"},{"id":133,"brand":"Hyundai","model":"Sonata","generation":"YF / 6 поколение","years":"2009–2014","start":2009,"end":2014,"body":"седан","segment":"D-класс"},{"id":134,"brand":"Hyundai","model":"Sonata","generation":"LF / 7 поколение","years":"2014–2019","start":2014,"end":2019,"body":"седан","segment":"D-класс"},{"id":135,"brand":"Hyundai","model":"Sonata","generation":"DN8 / 8 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"седан","segment":"D-класс"},{"id":136,"brand":"Hyundai","model":"Tucson","generation":"JM / 1 поколение","years":"2004–2009","start":2004,"end":2009,"body":"кроссовер","segment":"SUV"},{"id":137,"brand":"Hyundai","model":"Tucson","generation":"LM / ix35","years":"2009–2015","start":2009,"end":2015,"body":"кроссовер","segment":"SUV"},{"id":138,"brand":"Hyundai","model":"Tucson","generation":"TL / 3 поколение","years":"2015–2020","start":2015,"end":2020,"body":"кроссовер","segment":"SUV"},{"id":139,"brand":"Hyundai","model":"Tucson","generation":"NX4 / 4 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"кроссовер","segment":"SUV"},{"id":140,"brand":"Infiniti","model":"FX / QX70","generation":"S50","years":"2003–2008","start":2003,"end":2008,"body":"кроссовер","segment":"SUV"},{"id":141,"brand":"Infiniti","model":"FX / QX70","generation":"S51","years":"2008–2017","start":2008,"end":2017,"body":"кроссовер","segment":"SUV"},{"id":142,"brand":"Infiniti","model":"QX50","generation":"EX / J50","years":"2007–2013","start":2007,"end":2013,"body":"кроссовер","segment":"SUV"},{"id":143,"brand":"Infiniti","model":"QX50","generation":"J50 рестайлинг QX50","years":"2013–2017","start":2013,"end":2017,"body":"кроссовер","segment":"SUV"},{"id":144,"brand":"Infiniti","model":"QX50","generation":"J55 / 2 поколение","years":"2017–н.в.","start":2017,"end":null,"body":"кроссовер","segment":"SUV"},{"id":145,"brand":"Infiniti","model":"QX60","generation":"L50 / 1 поколение","years":"2012–2021","start":2012,"end":2021,"body":"кроссовер","segment":"SUV"},{"id":146,"brand":"Infiniti","model":"QX60","generation":"L51 / 2 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"кроссовер","segment":"SUV"},{"id":147,"brand":"Jaecoo","model":"J7","generation":"1 поколение","years":"2023–н.в.","start":2023,"end":null,"body":"кроссовер","segment":"SUV"},{"id":148,"brand":"Jaecoo","model":"J8","generation":"1 поколение","years":"2023–н.в.","start":2023,"end":null,"body":"кроссовер","segment":"SUV"},{"id":149,"brand":"Kia","model":"Ceed","generation":"ED / 1 поколение","years":"2006–2012","start":2006,"end":2012,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":150,"brand":"Kia","model":"Ceed","generation":"JD / 2 поколение","years":"2012–2018","start":2012,"end":2018,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":151,"brand":"Kia","model":"Ceed","generation":"CD / 3 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":152,"brand":"Kia","model":"Cerato","generation":"LD / 1 поколение","years":"2004–2008","start":2004,"end":2008,"body":"седан","segment":"C-класс"},{"id":153,"brand":"Kia","model":"Cerato","generation":"TD / 2 поколение","years":"2008–2013","start":2008,"end":2013,"body":"седан","segment":"C-класс"},{"id":154,"brand":"Kia","model":"Cerato","generation":"YD / 3 поколение","years":"2013–2018","start":2013,"end":2018,"body":"седан","segment":"C-класс"},{"id":155,"brand":"Kia","model":"Cerato","generation":"BD / 4 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"седан","segment":"C-класс"},{"id":156,"brand":"Kia","model":"Optima / K5","generation":"TF / 3 поколение","years":"2010–2015","start":2010,"end":2015,"body":"седан","segment":"D-класс"},{"id":157,"brand":"Kia","model":"Optima / K5","generation":"JF / 4 поколение","years":"2015–2020","start":2015,"end":2020,"body":"седан","segment":"D-класс"},{"id":158,"brand":"Kia","model":"Optima / K5","generation":"DL3 / 5 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"седан","segment":"D-класс"},{"id":159,"brand":"Kia","model":"Rio","generation":"JB / 2 поколение","years":"2005–2011","start":2005,"end":2011,"body":"седан / хэтчбек","segment":"B-класс"},{"id":160,"brand":"Kia","model":"Rio","generation":"QB / 3 поколение","years":"2011–2017","start":2011,"end":2017,"body":"седан / хэтчбек","segment":"B-класс"},{"id":161,"brand":"Kia","model":"Rio","generation":"FB / 4 поколение","years":"2017–2023","start":2017,"end":2023,"body":"седан / хэтчбек","segment":"B-класс"},{"id":162,"brand":"Kia","model":"Seltos","generation":"SP2 / 1 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер","segment":"SUV"},{"id":163,"brand":"Kia","model":"Sorento","generation":"BL / 1 поколение","years":"2002–2009","start":2002,"end":2009,"body":"кроссовер","segment":"SUV"},{"id":164,"brand":"Kia","model":"Sorento","generation":"XM / 2 поколение","years":"2009–2014","start":2009,"end":2014,"body":"кроссовер","segment":"SUV"},{"id":165,"brand":"Kia","model":"Sorento","generation":"UM / 3 поколение","years":"2014–2020","start":2014,"end":2020,"body":"кроссовер","segment":"SUV"},{"id":166,"brand":"Kia","model":"Sorento","generation":"MQ4 / 4 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"кроссовер","segment":"SUV"},{"id":167,"brand":"Kia","model":"Soul","generation":"AM / 1 поколение","years":"2008–2014","start":2008,"end":2014,"body":"хэтчбек / кроссовер","segment":"B-класс"},{"id":168,"brand":"Kia","model":"Soul","generation":"PS / 2 поколение","years":"2014–2019","start":2014,"end":2019,"body":"хэтчбек / кроссовер","segment":"B-класс"},{"id":169,"brand":"Kia","model":"Soul","generation":"SK3 / 3 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"хэтчбек / кроссовер","segment":"B-класс"},{"id":170,"brand":"Kia","model":"Sportage","generation":"KM / 2 поколение","years":"2004–2010","start":2004,"end":2010,"body":"кроссовер","segment":"SUV"},{"id":171,"brand":"Kia","model":"Sportage","generation":"SL / 3 поколение","years":"2010–2015","start":2010,"end":2015,"body":"кроссовер","segment":"SUV"},{"id":172,"brand":"Kia","model":"Sportage","generation":"QL / 4 поколение","years":"2015–2021","start":2015,"end":2021,"body":"кроссовер","segment":"SUV"},{"id":173,"brand":"Kia","model":"Sportage","generation":"NQ5 / 5 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"кроссовер","segment":"SUV"},{"id":174,"brand":"Lada","model":"2107","generation":"ВАЗ-2107","years":"1982–2012","start":1982,"end":2012,"body":"седан","segment":"B-класс"},{"id":175,"brand":"Lada","model":"Granta","generation":"2190 / 1 поколение","years":"2011–2018","start":2011,"end":2018,"body":"седан / лифтбек / универсал","segment":"B-класс"},{"id":176,"brand":"Lada","model":"Granta","generation":"2190 FL / рестайлинг","years":"2018–н.в.","start":2018,"end":null,"body":"седан / лифтбек / универсал","segment":"B-класс"},{"id":177,"brand":"Lada","model":"Kalina","generation":"1117 / 1118 / 1119","years":"2004–2013","start":2004,"end":2013,"body":"седан / хэтчбек / универсал","segment":"B-класс"},{"id":178,"brand":"Lada","model":"Kalina","generation":"2192 / 2194","years":"2013–2018","start":2013,"end":2018,"body":"седан / хэтчбек / универсал","segment":"B-класс"},{"id":179,"brand":"Lada","model":"Largus","generation":"1 поколение","years":"2012–2021","start":2012,"end":2021,"body":"универсал / фургон","segment":"MPV"},{"id":180,"brand":"Lada","model":"Largus","generation":"FL","years":"2021–н.в.","start":2021,"end":null,"body":"универсал / фургон","segment":"MPV"},{"id":181,"brand":"Lada","model":"Niva Legend","generation":"2121 / 2131","years":"1977–н.в.","start":1977,"end":null,"body":"внедорожник","segment":"SUV"},{"id":182,"brand":"Lada","model":"Niva Travel","generation":"1 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"внедорожник","segment":"SUV"},{"id":183,"brand":"Lada","model":"Priora","generation":"2170 / 2171 / 2172","years":"2007–2018","start":2007,"end":2018,"body":"седан / хэтчбек / универсал","segment":"B-класс"},{"id":184,"brand":"Lada","model":"Vesta","generation":"1 поколение","years":"2015–2022","start":2015,"end":2022,"body":"седан / универсал","segment":"B+"},{"id":185,"brand":"Lada","model":"Vesta","generation":"NG / рестайлинг","years":"2022–н.в.","start":2022,"end":null,"body":"седан / универсал","segment":"B+"},{"id":186,"brand":"Lada","model":"XRAY","generation":"1 поколение","years":"2015–2022","start":2015,"end":2022,"body":"хэтчбек / кроссовер","segment":"B-класс"},{"id":187,"brand":"Lexus","model":"ES","generation":"XV40","years":"2006–2012","start":2006,"end":2012,"body":"седан","segment":"E-класс"},{"id":188,"brand":"Lexus","model":"ES","generation":"XV60","years":"2012–2018","start":2012,"end":2018,"body":"седан","segment":"E-класс"},{"id":189,"brand":"Lexus","model":"ES","generation":"XZ10 / 7 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"седан","segment":"E-класс"},{"id":190,"brand":"Lexus","model":"LX","generation":"J100","years":"1998–2007","start":1998,"end":2007,"body":"внедорожник","segment":"SUV"},{"id":191,"brand":"Lexus","model":"LX","generation":"J200","years":"2007–2021","start":2007,"end":2021,"body":"внедорожник","segment":"SUV"},{"id":192,"brand":"Lexus","model":"LX","generation":"J300","years":"2021–н.в.","start":2021,"end":null,"body":"внедорожник","segment":"SUV"},{"id":193,"brand":"Lexus","model":"NX","generation":"AZ10 / 1 поколение","years":"2014–2021","start":2014,"end":2021,"body":"кроссовер","segment":"SUV"},{"id":194,"brand":"Lexus","model":"NX","generation":"AZ20 / 2 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"кроссовер","segment":"SUV"},{"id":195,"brand":"Lexus","model":"RX","generation":"XU30 / 2 поколение","years":"2003–2009","start":2003,"end":2009,"body":"кроссовер","segment":"SUV"},{"id":196,"brand":"Lexus","model":"RX","generation":"AL10 / 3 поколение","years":"2008–2015","start":2008,"end":2015,"body":"кроссовер","segment":"SUV"},{"id":197,"brand":"Lexus","model":"RX","generation":"AL20 / 4 поколение","years":"2015–2022","start":2015,"end":2022,"body":"кроссовер","segment":"SUV"},{"id":198,"brand":"Lexus","model":"RX","generation":"ALA10 / 5 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"кроссовер","segment":"SUV"},{"id":199,"brand":"Mazda","model":"CX-30","generation":"DM / 1 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер","segment":"SUV"},{"id":200,"brand":"Mazda","model":"CX-5","generation":"KE / 1 поколение","years":"2011–2017","start":2011,"end":2017,"body":"кроссовер","segment":"SUV"},{"id":201,"brand":"Mazda","model":"CX-5","generation":"KF / 2 поколение","years":"2017–н.в.","start":2017,"end":null,"body":"кроссовер","segment":"SUV"},{"id":202,"brand":"Mazda","model":"CX-7","generation":"ER / 1 поколение","years":"2006–2012","start":2006,"end":2012,"body":"кроссовер","segment":"SUV"},{"id":203,"brand":"Mazda","model":"CX-9","generation":"TB / 1 поколение","years":"2006–2015","start":2006,"end":2015,"body":"кроссовер","segment":"SUV"},{"id":204,"brand":"Mazda","model":"CX-9","generation":"TC / 2 поколение","years":"2016–2023","start":2016,"end":2023,"body":"кроссовер","segment":"SUV"},{"id":205,"brand":"Mazda","model":"Mazda3","generation":"BK / 1 поколение","years":"2003–2009","start":2003,"end":2009,"body":"седан / хэтчбек","segment":"C-класс"},{"id":206,"brand":"Mazda","model":"Mazda3","generation":"BL / 2 поколение","years":"2009–2013","start":2009,"end":2013,"body":"седан / хэтчбек","segment":"C-класс"},{"id":207,"brand":"Mazda","model":"Mazda3","generation":"BM / 3 поколение","years":"2013–2019","start":2013,"end":2019,"body":"седан / хэтчбек","segment":"C-класс"},{"id":208,"brand":"Mazda","model":"Mazda3","generation":"BP / 4 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"седан / хэтчбек","segment":"C-класс"},{"id":209,"brand":"Mazda","model":"Mazda6","generation":"GG / 1 поколение","years":"2002–2008","start":2002,"end":2008,"body":"седан / универсал","segment":"D-класс"},{"id":210,"brand":"Mazda","model":"Mazda6","generation":"GH / 2 поколение","years":"2007–2012","start":2007,"end":2012,"body":"седан / универсал","segment":"D-класс"},{"id":211,"brand":"Mazda","model":"Mazda6","generation":"GJ / 3 поколение","years":"2012–2024","start":2012,"end":2024,"body":"седан / универсал","segment":"D-класс"},{"id":212,"brand":"Mercedes-Benz","model":"C-Class","generation":"W204","years":"2007–2014","start":2007,"end":2014,"body":"седан / универсал / купе","segment":"D-класс"},{"id":213,"brand":"Mercedes-Benz","model":"C-Class","generation":"W205","years":"2014–2021","start":2014,"end":2021,"body":"седан / универсал / купе","segment":"D-класс"},{"id":214,"brand":"Mercedes-Benz","model":"C-Class","generation":"W206","years":"2021–н.в.","start":2021,"end":null,"body":"седан / универсал / купе","segment":"D-класс"},{"id":215,"brand":"Mercedes-Benz","model":"E-Class","generation":"W211","years":"2002–2009","start":2002,"end":2009,"body":"седан / универсал","segment":"E-класс"},{"id":216,"brand":"Mercedes-Benz","model":"E-Class","generation":"W212","years":"2009–2016","start":2009,"end":2016,"body":"седан / универсал","segment":"E-класс"},{"id":217,"brand":"Mercedes-Benz","model":"E-Class","generation":"W213","years":"2016–2023","start":2016,"end":2023,"body":"седан / универсал","segment":"E-класс"},{"id":218,"brand":"Mercedes-Benz","model":"E-Class","generation":"W214","years":"2023–н.в.","start":2023,"end":null,"body":"седан / универсал","segment":"E-класс"},{"id":219,"brand":"Mercedes-Benz","model":"GLC","generation":"X253 / 1 поколение","years":"2015–2022","start":2015,"end":2022,"body":"кроссовер","segment":"SUV"},{"id":220,"brand":"Mercedes-Benz","model":"GLC","generation":"X254 / 2 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"кроссовер","segment":"SUV"},{"id":221,"brand":"Mercedes-Benz","model":"GLE","generation":"W166 / M-Class/GLE","years":"2011–2019","start":2011,"end":2019,"body":"кроссовер","segment":"SUV"},{"id":222,"brand":"Mercedes-Benz","model":"GLE","generation":"V167 / 2 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер","segment":"SUV"},{"id":223,"brand":"Mercedes-Benz","model":"S-Class","generation":"W221","years":"2005–2013","start":2005,"end":2013,"body":"седан","segment":"F-класс"},{"id":224,"brand":"Mercedes-Benz","model":"S-Class","generation":"W222","years":"2013–2020","start":2013,"end":2020,"body":"седан","segment":"F-класс"},{"id":225,"brand":"Mercedes-Benz","model":"S-Class","generation":"W223","years":"2020–н.в.","start":2020,"end":null,"body":"седан","segment":"F-класс"},{"id":226,"brand":"Mitsubishi","model":"ASX","generation":"GA / 1 поколение","years":"2010–н.в.","start":2010,"end":null,"body":"кроссовер","segment":"SUV"},{"id":227,"brand":"Mitsubishi","model":"Eclipse Cross","generation":"1 поколение","years":"2017–н.в.","start":2017,"end":null,"body":"кроссовер","segment":"SUV"},{"id":228,"brand":"Mitsubishi","model":"Lancer","generation":"IX / CS","years":"2000–2010","start":2000,"end":2010,"body":"седан / универсал","segment":"C-класс"},{"id":229,"brand":"Mitsubishi","model":"Lancer","generation":"X / CY","years":"2007–2017","start":2007,"end":2017,"body":"седан / универсал","segment":"C-класс"},{"id":230,"brand":"Mitsubishi","model":"Outlander","generation":"CU / 1 поколение","years":"2001–2008","start":2001,"end":2008,"body":"кроссовер","segment":"SUV"},{"id":231,"brand":"Mitsubishi","model":"Outlander","generation":"CW / XL","years":"2005–2012","start":2005,"end":2012,"body":"кроссовер","segment":"SUV"},{"id":232,"brand":"Mitsubishi","model":"Outlander","generation":"GF/GG / 3 поколение","years":"2012–2021","start":2012,"end":2021,"body":"кроссовер","segment":"SUV"},{"id":233,"brand":"Mitsubishi","model":"Outlander","generation":"GN / 4 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"кроссовер","segment":"SUV"},{"id":234,"brand":"Mitsubishi","model":"Pajero","generation":"III","years":"1999–2006","start":1999,"end":2006,"body":"внедорожник","segment":"SUV"},{"id":235,"brand":"Mitsubishi","model":"Pajero","generation":"IV","years":"2006–2021","start":2006,"end":2021,"body":"внедорожник","segment":"SUV"},{"id":236,"brand":"Mitsubishi","model":"Pajero Sport","generation":"1 поколение","years":"1996–2008","start":1996,"end":2008,"body":"внедорожник","segment":"SUV"},{"id":237,"brand":"Mitsubishi","model":"Pajero Sport","generation":"2 поколение","years":"2008–2015","start":2008,"end":2015,"body":"внедорожник","segment":"SUV"},{"id":238,"brand":"Mitsubishi","model":"Pajero Sport","generation":"3 поколение","years":"2015–н.в.","start":2015,"end":null,"body":"внедорожник","segment":"SUV"},{"id":239,"brand":"Nissan","model":"Almera","generation":"N16","years":"2000–2006","start":2000,"end":2006,"body":"седан / хэтчбек","segment":"C-класс"},{"id":240,"brand":"Nissan","model":"Almera","generation":"G15","years":"2012–2018","start":2012,"end":2018,"body":"седан / хэтчбек","segment":"C-класс"},{"id":241,"brand":"Nissan","model":"Juke","generation":"F15 / 1 поколение","years":"2010–2019","start":2010,"end":2019,"body":"кроссовер","segment":"SUV"},{"id":242,"brand":"Nissan","model":"Juke","generation":"F16 / 2 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер","segment":"SUV"},{"id":243,"brand":"Nissan","model":"Murano","generation":"Z50 / 1 поколение","years":"2002–2008","start":2002,"end":2008,"body":"кроссовер","segment":"SUV"},{"id":244,"brand":"Nissan","model":"Murano","generation":"Z51 / 2 поколение","years":"2008–2014","start":2008,"end":2014,"body":"кроссовер","segment":"SUV"},{"id":245,"brand":"Nissan","model":"Murano","generation":"Z52 / 3 поколение","years":"2014–2024","start":2014,"end":2024,"body":"кроссовер","segment":"SUV"},{"id":246,"brand":"Nissan","model":"Note","generation":"E11 / 1 поколение","years":"2005–2013","start":2005,"end":2013,"body":"хэтчбек","segment":"B-класс"},{"id":247,"brand":"Nissan","model":"Note","generation":"E12 / 2 поколение","years":"2012–2020","start":2012,"end":2020,"body":"хэтчбек","segment":"B-класс"},{"id":248,"brand":"Nissan","model":"Note","generation":"E13 / 3 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"хэтчбек","segment":"B-класс"},{"id":249,"brand":"Nissan","model":"Qashqai","generation":"J10 / 1 поколение","years":"2006–2013","start":2006,"end":2013,"body":"кроссовер","segment":"SUV"},{"id":250,"brand":"Nissan","model":"Qashqai","generation":"J11 / 2 поколение","years":"2013–2021","start":2013,"end":2021,"body":"кроссовер","segment":"SUV"},{"id":251,"brand":"Nissan","model":"Qashqai","generation":"J12 / 3 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"кроссовер","segment":"SUV"},{"id":252,"brand":"Nissan","model":"Sentra","generation":"B17","years":"2012–2019","start":2012,"end":2019,"body":"седан","segment":"C-класс"},{"id":253,"brand":"Nissan","model":"Sentra","generation":"B18","years":"2019–н.в.","start":2019,"end":null,"body":"седан","segment":"C-класс"},{"id":254,"brand":"Nissan","model":"Teana","generation":"J31 / 1 поколение","years":"2003–2008","start":2003,"end":2008,"body":"седан","segment":"D-класс"},{"id":255,"brand":"Nissan","model":"Teana","generation":"J32 / 2 поколение","years":"2008–2014","start":2008,"end":2014,"body":"седан","segment":"D-класс"},{"id":256,"brand":"Nissan","model":"Teana","generation":"L33 / 3 поколение","years":"2013–2020","start":2013,"end":2020,"body":"седан","segment":"D-класс"},{"id":257,"brand":"Nissan","model":"X-Trail","generation":"T30 / 1 поколение","years":"2000–2007","start":2000,"end":2007,"body":"кроссовер","segment":"SUV"},{"id":258,"brand":"Nissan","model":"X-Trail","generation":"T31 / 2 поколение","years":"2007–2013","start":2007,"end":2013,"body":"кроссовер","segment":"SUV"},{"id":259,"brand":"Nissan","model":"X-Trail","generation":"T32 / 3 поколение","years":"2013–2021","start":2013,"end":2021,"body":"кроссовер","segment":"SUV"},{"id":260,"brand":"Nissan","model":"X-Trail","generation":"T33 / 4 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"кроссовер","segment":"SUV"},{"id":261,"brand":"Omoda","model":"C5","generation":"1 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"кроссовер","segment":"SUV"},{"id":262,"brand":"Omoda","model":"S5","generation":"1 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"седан","segment":"C-класс"},{"id":263,"brand":"Opel","model":"Astra","generation":"H / 3 поколение","years":"2004–2010","start":2004,"end":2010,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":264,"brand":"Opel","model":"Astra","generation":"J / 4 поколение","years":"2009–2015","start":2009,"end":2015,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":265,"brand":"Opel","model":"Astra","generation":"K / 5 поколение","years":"2015–2021","start":2015,"end":2021,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":266,"brand":"Opel","model":"Astra","generation":"L / 6 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":267,"brand":"Opel","model":"Corsa","generation":"D","years":"2006–2014","start":2006,"end":2014,"body":"хэтчбек","segment":"B-класс"},{"id":268,"brand":"Opel","model":"Corsa","generation":"E","years":"2014–2019","start":2014,"end":2019,"body":"хэтчбек","segment":"B-класс"},{"id":269,"brand":"Opel","model":"Corsa","generation":"F","years":"2019–н.в.","start":2019,"end":null,"body":"хэтчбек","segment":"B-класс"},{"id":270,"brand":"Opel","model":"Insignia","generation":"1 поколение","years":"2008–2017","start":2008,"end":2017,"body":"лифтбек / универсал","segment":"D-класс"},{"id":271,"brand":"Opel","model":"Insignia","generation":"2 поколение","years":"2017–2022","start":2017,"end":2022,"body":"лифтбек / универсал","segment":"D-класс"},{"id":272,"brand":"Opel","model":"Mokka","generation":"1 поколение","years":"2012–2019","start":2012,"end":2019,"body":"кроссовер","segment":"SUV"},{"id":273,"brand":"Opel","model":"Mokka","generation":"2 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"кроссовер","segment":"SUV"},{"id":274,"brand":"Peugeot","model":"3008","generation":"1 поколение","years":"2008–2016","start":2008,"end":2016,"body":"кроссовер","segment":"SUV"},{"id":275,"brand":"Peugeot","model":"3008","generation":"2 поколение","years":"2016–2024","start":2016,"end":2024,"body":"кроссовер","segment":"SUV"},{"id":276,"brand":"Peugeot","model":"3008","generation":"3 поколение","years":"2023–н.в.","start":2023,"end":null,"body":"кроссовер","segment":"SUV"},{"id":277,"brand":"Peugeot","model":"308","generation":"T7 / 1 поколение","years":"2007–2013","start":2007,"end":2013,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":278,"brand":"Peugeot","model":"308","generation":"T9 / 2 поколение","years":"2013–2021","start":2013,"end":2021,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":279,"brand":"Peugeot","model":"308","generation":"P5 / 3 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":280,"brand":"Peugeot","model":"408","generation":"1 поколение","years":"2010–2022","start":2010,"end":2022,"body":"седан / лифтбек","segment":"C/D"},{"id":281,"brand":"Peugeot","model":"408","generation":"2 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"седан / лифтбек","segment":"C/D"},{"id":282,"brand":"Peugeot","model":"Partner","generation":"2 поколение","years":"2008–2018","start":2008,"end":2018,"body":"минивэн / фургон","segment":"MPV"},{"id":283,"brand":"Peugeot","model":"Partner","generation":"3 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"минивэн / фургон","segment":"MPV"},{"id":284,"brand":"Renault","model":"Arkana","generation":"1 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер-купе","segment":"SUV"},{"id":285,"brand":"Renault","model":"Duster","generation":"1 поколение","years":"2010–2021","start":2010,"end":2021,"body":"кроссовер","segment":"SUV"},{"id":286,"brand":"Renault","model":"Duster","generation":"2 поколение","years":"2017–н.в.","start":2017,"end":null,"body":"кроссовер","segment":"SUV"},{"id":287,"brand":"Renault","model":"Fluence","generation":"1 поколение","years":"2009–2016","start":2009,"end":2016,"body":"седан","segment":"C-класс"},{"id":288,"brand":"Renault","model":"Kaptur","generation":"1 поколение","years":"2016–2022","start":2016,"end":2022,"body":"кроссовер","segment":"SUV"},{"id":289,"brand":"Renault","model":"Logan","generation":"1 поколение","years":"2004–2015","start":2004,"end":2015,"body":"седан","segment":"B-класс"},{"id":290,"brand":"Renault","model":"Logan","generation":"2 поколение","years":"2012–2022","start":2012,"end":2022,"body":"седан","segment":"B-класс"},{"id":291,"brand":"Renault","model":"Logan","generation":"3 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"седан","segment":"B-класс"},{"id":292,"brand":"Renault","model":"Megane","generation":"2 поколение","years":"2002–2009","start":2002,"end":2009,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":293,"brand":"Renault","model":"Megane","generation":"3 поколение","years":"2008–2016","start":2008,"end":2016,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":294,"brand":"Renault","model":"Megane","generation":"4 поколение","years":"2016–2024","start":2016,"end":2024,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":295,"brand":"Renault","model":"Sandero","generation":"1 поколение","years":"2007–2014","start":2007,"end":2014,"body":"хэтчбек","segment":"B-класс"},{"id":296,"brand":"Renault","model":"Sandero","generation":"2 поколение","years":"2012–2022","start":2012,"end":2022,"body":"хэтчбек","segment":"B-класс"},{"id":297,"brand":"Renault","model":"Sandero","generation":"3 поколение","years":"2020–н.в.","start":2020,"end":null,"body":"хэтчбек","segment":"B-класс"},{"id":298,"brand":"Skoda","model":"Fabia","generation":"1 поколение","years":"1999–2007","start":1999,"end":2007,"body":"хэтчбек / универсал","segment":"B-класс"},{"id":299,"brand":"Skoda","model":"Fabia","generation":"2 поколение","years":"2007–2014","start":2007,"end":2014,"body":"хэтчбек / универсал","segment":"B-класс"},{"id":300,"brand":"Skoda","model":"Fabia","generation":"3 поколение","years":"2014–2021","start":2014,"end":2021,"body":"хэтчбек / универсал","segment":"B-класс"},{"id":301,"brand":"Skoda","model":"Fabia","generation":"4 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"хэтчбек / универсал","segment":"B-класс"},{"id":302,"brand":"Skoda","model":"Karoq","generation":"1 поколение","years":"2017–н.в.","start":2017,"end":null,"body":"кроссовер","segment":"SUV"},{"id":303,"brand":"Skoda","model":"Kodiaq","generation":"1 поколение","years":"2016–2023","start":2016,"end":2023,"body":"кроссовер","segment":"SUV"},{"id":304,"brand":"Skoda","model":"Kodiaq","generation":"2 поколение","years":"2023–н.в.","start":2023,"end":null,"body":"кроссовер","segment":"SUV"},{"id":305,"brand":"Skoda","model":"Octavia","generation":"A5 / 2 поколение","years":"2004–2013","start":2004,"end":2013,"body":"лифтбек / универсал","segment":"C-класс"},{"id":306,"brand":"Skoda","model":"Octavia","generation":"A7 / 3 поколение","years":"2013–2020","start":2013,"end":2020,"body":"лифтбек / универсал","segment":"C-класс"},{"id":307,"brand":"Skoda","model":"Octavia","generation":"A8 / 4 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"лифтбек / универсал","segment":"C-класс"},{"id":308,"brand":"Skoda","model":"Rapid","generation":"1 поколение","years":"2012–2020","start":2012,"end":2020,"body":"лифтбек","segment":"B+"},{"id":309,"brand":"Skoda","model":"Rapid","generation":"лифтбек РФ / 2 поколение","years":"2020–2022","start":2020,"end":2022,"body":"лифтбек","segment":"B+"},{"id":310,"brand":"Skoda","model":"Superb","generation":"B6 / 2 поколение","years":"2008–2015","start":2008,"end":2015,"body":"лифтбек / универсал","segment":"D/E"},{"id":311,"brand":"Skoda","model":"Superb","generation":"B8 / 3 поколение","years":"2015–2023","start":2015,"end":2023,"body":"лифтбек / универсал","segment":"D/E"},{"id":312,"brand":"Skoda","model":"Superb","generation":"4 поколение","years":"2023–н.в.","start":2023,"end":null,"body":"лифтбек / универсал","segment":"D/E"},{"id":313,"brand":"Subaru","model":"Forester","generation":"SG / 2 поколение","years":"2002–2008","start":2002,"end":2008,"body":"кроссовер","segment":"SUV"},{"id":314,"brand":"Subaru","model":"Forester","generation":"SH / 3 поколение","years":"2008–2012","start":2008,"end":2012,"body":"кроссовер","segment":"SUV"},{"id":315,"brand":"Subaru","model":"Forester","generation":"SJ / 4 поколение","years":"2012–2018","start":2012,"end":2018,"body":"кроссовер","segment":"SUV"},{"id":316,"brand":"Subaru","model":"Forester","generation":"SK / 5 поколение","years":"2018–2024","start":2018,"end":2024,"body":"кроссовер","segment":"SUV"},{"id":317,"brand":"Subaru","model":"Forester","generation":"SL / 6 поколение","years":"2024–н.в.","start":2024,"end":null,"body":"кроссовер","segment":"SUV"},{"id":318,"brand":"Subaru","model":"Impreza","generation":"GE/GH/GR / 3 поколение","years":"2007–2014","start":2007,"end":2014,"body":"седан / хэтчбек","segment":"C-класс"},{"id":319,"brand":"Subaru","model":"Impreza","generation":"GJ/GP / 4 поколение","years":"2011–2016","start":2011,"end":2016,"body":"седан / хэтчбек","segment":"C-класс"},{"id":320,"brand":"Subaru","model":"Impreza","generation":"GK/GT / 5 поколение","years":"2016–2023","start":2016,"end":2023,"body":"седан / хэтчбек","segment":"C-класс"},{"id":321,"brand":"Subaru","model":"Impreza","generation":"GU / 6 поколение","years":"2023–н.в.","start":2023,"end":null,"body":"седан / хэтчбек","segment":"C-класс"},{"id":322,"brand":"Subaru","model":"Outback","generation":"BP / 3 поколение","years":"2003–2009","start":2003,"end":2009,"body":"универсал повышенной проходимости","segment":"SUV"},{"id":323,"brand":"Subaru","model":"Outback","generation":"BR / 4 поколение","years":"2009–2014","start":2009,"end":2014,"body":"универсал повышенной проходимости","segment":"SUV"},{"id":324,"brand":"Subaru","model":"Outback","generation":"BS / 5 поколение","years":"2014–2021","start":2014,"end":2021,"body":"универсал повышенной проходимости","segment":"SUV"},{"id":325,"brand":"Subaru","model":"Outback","generation":"BT / 6 поколение","years":"2021–н.в.","start":2021,"end":null,"body":"универсал повышенной проходимости","segment":"SUV"},{"id":326,"brand":"Subaru","model":"XV / Crosstrek","generation":"GP / 1 поколение","years":"2011–2017","start":2011,"end":2017,"body":"кроссовер","segment":"SUV"},{"id":327,"brand":"Subaru","model":"XV / Crosstrek","generation":"GT / 2 поколение","years":"2017–2023","start":2017,"end":2023,"body":"кроссовер","segment":"SUV"},{"id":328,"brand":"Subaru","model":"XV / Crosstrek","generation":"GU / 3 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"кроссовер","segment":"SUV"},{"id":329,"brand":"Suzuki","model":"Grand Vitara","generation":"FT/GT","years":"1998–2005","start":1998,"end":2005,"body":"внедорожник / кроссовер","segment":"SUV"},{"id":330,"brand":"Suzuki","model":"Grand Vitara","generation":"JT","years":"2005–2015","start":2005,"end":2015,"body":"внедорожник / кроссовер","segment":"SUV"},{"id":331,"brand":"Suzuki","model":"Jimny","generation":"JB43 / 3 поколение","years":"1998–2018","start":1998,"end":2018,"body":"внедорожник","segment":"SUV"},{"id":332,"brand":"Suzuki","model":"Jimny","generation":"JB64/JB74 / 4 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"внедорожник","segment":"SUV"},{"id":333,"brand":"Suzuki","model":"SX4","generation":"GY / 1 поколение","years":"2006–2014","start":2006,"end":2014,"body":"хэтчбек / кроссовер","segment":"B/C"},{"id":334,"brand":"Suzuki","model":"SX4","generation":"JY / 2 поколение","years":"2013–2021","start":2013,"end":2021,"body":"хэтчбек / кроссовер","segment":"B/C"},{"id":335,"brand":"Suzuki","model":"Vitara","generation":"LY / 4 поколение","years":"2015–н.в.","start":2015,"end":null,"body":"кроссовер","segment":"SUV"},{"id":336,"brand":"Toyota","model":"Auris","generation":"E150 / 1 поколение","years":"2006–2012","start":2006,"end":2012,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":337,"brand":"Toyota","model":"Auris","generation":"E180 / 2 поколение","years":"2012–2018","start":2012,"end":2018,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":338,"brand":"Toyota","model":"Avensis","generation":"T250 / 2 поколение","years":"2003–2009","start":2003,"end":2009,"body":"седан / универсал","segment":"D-класс"},{"id":339,"brand":"Toyota","model":"Avensis","generation":"T270 / 3 поколение","years":"2009–2018","start":2009,"end":2018,"body":"седан / универсал","segment":"D-класс"},{"id":340,"brand":"Toyota","model":"Camry","generation":"XV30 / 5 поколение","years":"2001–2006","start":2001,"end":2006,"body":"седан","segment":"D/E"},{"id":341,"brand":"Toyota","model":"Camry","generation":"XV40 / 6 поколение","years":"2006–2011","start":2006,"end":2011,"body":"седан","segment":"D/E"},{"id":342,"brand":"Toyota","model":"Camry","generation":"XV50 / 7 поколение","years":"2011–2018","start":2011,"end":2018,"body":"седан","segment":"D/E"},{"id":343,"brand":"Toyota","model":"Camry","generation":"XV70 / 8 поколение","years":"2017–2024","start":2017,"end":2024,"body":"седан","segment":"D/E"},{"id":344,"brand":"Toyota","model":"Camry","generation":"XV80 / 9 поколение","years":"2024–н.в.","start":2024,"end":null,"body":"седан","segment":"D/E"},{"id":345,"brand":"Toyota","model":"Corolla","generation":"E120 / 9 поколение","years":"2000–2007","start":2000,"end":2007,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":346,"brand":"Toyota","model":"Corolla","generation":"E140/E150 / 10 поколение","years":"2006–2013","start":2006,"end":2013,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":347,"brand":"Toyota","model":"Corolla","generation":"E170/E180 / 11 поколение","years":"2013–2019","start":2013,"end":2019,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":348,"brand":"Toyota","model":"Corolla","generation":"E210 / 12 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"седан / хэтчбек / универсал","segment":"C-класс"},{"id":349,"brand":"Toyota","model":"Highlander","generation":"XU40 / 2 поколение","years":"2007–2013","start":2007,"end":2013,"body":"кроссовер","segment":"SUV"},{"id":350,"brand":"Toyota","model":"Highlander","generation":"XU50 / 3 поколение","years":"2013–2019","start":2013,"end":2019,"body":"кроссовер","segment":"SUV"},{"id":351,"brand":"Toyota","model":"Highlander","generation":"XU70 / 4 поколение","years":"2019–н.в.","start":2019,"end":null,"body":"кроссовер","segment":"SUV"},{"id":352,"brand":"Toyota","model":"Hilux","generation":"AN10/AN20/AN30 / 7 поколение","years":"2004–2015","start":2004,"end":2015,"body":"пикап","segment":"Pickup"},{"id":353,"brand":"Toyota","model":"Hilux","generation":"AN120/AN130 / 8 поколение","years":"2015–н.в.","start":2015,"end":null,"body":"пикап","segment":"Pickup"},{"id":354,"brand":"Toyota","model":"Land Cruiser","generation":"J100","years":"1998–2007","start":1998,"end":2007,"body":"внедорожник","segment":"SUV"},{"id":355,"brand":"Toyota","model":"Land Cruiser","generation":"J200","years":"2007–2021","start":2007,"end":2021,"body":"внедорожник","segment":"SUV"},{"id":356,"brand":"Toyota","model":"Land Cruiser","generation":"J300","years":"2021–н.в.","start":2021,"end":null,"body":"внедорожник","segment":"SUV"},{"id":357,"brand":"Toyota","model":"Land Cruiser Prado","generation":"J120","years":"2002–2009","start":2002,"end":2009,"body":"внедорожник","segment":"SUV"},{"id":358,"brand":"Toyota","model":"Land Cruiser Prado","generation":"J150","years":"2009–2023","start":2009,"end":2023,"body":"внедорожник","segment":"SUV"},{"id":359,"brand":"Toyota","model":"Land Cruiser Prado","generation":"J250","years":"2023–н.в.","start":2023,"end":null,"body":"внедорожник","segment":"SUV"},{"id":360,"brand":"Toyota","model":"Prius","generation":"XW20 / 2 поколение","years":"2003–2009","start":2003,"end":2009,"body":"лифтбек","segment":"C-класс"},{"id":361,"brand":"Toyota","model":"Prius","generation":"XW30 / 3 поколение","years":"2009–2015","start":2009,"end":2015,"body":"лифтбек","segment":"C-класс"},{"id":362,"brand":"Toyota","model":"Prius","generation":"XW50 / 4 поколение","years":"2015–2022","start":2015,"end":2022,"body":"лифтбек","segment":"C-класс"},{"id":363,"brand":"Toyota","model":"Prius","generation":"XW60 / 5 поколение","years":"2022–н.в.","start":2022,"end":null,"body":"лифтбек","segment":"C-класс"},{"id":364,"brand":"Toyota","model":"RAV4","generation":"XA20 / 2 поколение","years":"2000–2005","start":2000,"end":2005,"body":"кроссовер","segment":"SUV"},{"id":365,"brand":"Toyota","model":"RAV4","generation":"XA30 / 3 поколение","years":"2005–2012","start":2005,"end":2012,"body":"кроссовер","segment":"SUV"},{"id":366,"brand":"Toyota","model":"RAV4","generation":"XA40 / 4 поколение","years":"2012–2018","start":2012,"end":2018,"body":"кроссовер","segment":"SUV"},{"id":367,"brand":"Toyota","model":"RAV4","generation":"XA50 / 5 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"кроссовер","segment":"SUV"},{"id":368,"brand":"Volkswagen","model":"Golf","generation":"Mk5","years":"2003–2008","start":2003,"end":2008,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":369,"brand":"Volkswagen","model":"Golf","generation":"Mk6","years":"2008–2012","start":2008,"end":2012,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":370,"brand":"Volkswagen","model":"Golf","generation":"Mk7","years":"2012–2020","start":2012,"end":2020,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":371,"brand":"Volkswagen","model":"Golf","generation":"Mk8","years":"2019–н.в.","start":2019,"end":null,"body":"хэтчбек / универсал","segment":"C-класс"},{"id":372,"brand":"Volkswagen","model":"Jetta","generation":"A5 / 5 поколение","years":"2005–2010","start":2005,"end":2010,"body":"седан","segment":"C-класс"},{"id":373,"brand":"Volkswagen","model":"Jetta","generation":"A6 / 6 поколение","years":"2010–2018","start":2010,"end":2018,"body":"седан","segment":"C-класс"},{"id":374,"brand":"Volkswagen","model":"Jetta","generation":"A7 / 7 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"седан","segment":"C-класс"},{"id":375,"brand":"Volkswagen","model":"Passat","generation":"B6","years":"2005–2010","start":2005,"end":2010,"body":"седан / универсал","segment":"D-класс"},{"id":376,"brand":"Volkswagen","model":"Passat","generation":"B7","years":"2010–2015","start":2010,"end":2015,"body":"седан / универсал","segment":"D-класс"},{"id":377,"brand":"Volkswagen","model":"Passat","generation":"B8","years":"2014–2023","start":2014,"end":2023,"body":"седан / универсал","segment":"D-класс"},{"id":378,"brand":"Volkswagen","model":"Passat","generation":"B9","years":"2023–н.в.","start":2023,"end":null,"body":"седан / универсал","segment":"D-класс"},{"id":379,"brand":"Volkswagen","model":"Polo","generation":"Mk4 / 9N","years":"2001–2009","start":2001,"end":2009,"body":"седан / лифтбек / хэтчбек","segment":"B-класс"},{"id":380,"brand":"Volkswagen","model":"Polo","generation":"Polo Sedan / 5 поколение","years":"2010–2020","start":2010,"end":2020,"body":"седан / лифтбек / хэтчбек","segment":"B-класс"},{"id":381,"brand":"Volkswagen","model":"Polo","generation":"Mk6 / AW","years":"2017–н.в.","start":2017,"end":null,"body":"седан / лифтбек / хэтчбек","segment":"B-класс"},{"id":382,"brand":"Volkswagen","model":"Polo","generation":"Polo Liftback / РФ","years":"2020–2022","start":2020,"end":2022,"body":"седан / лифтбек / хэтчбек","segment":"B-класс"},{"id":383,"brand":"Volkswagen","model":"Tiguan","generation":"1 поколение","years":"2007–2016","start":2007,"end":2016,"body":"кроссовер","segment":"SUV"},{"id":384,"brand":"Volkswagen","model":"Tiguan","generation":"2 поколение","years":"2016–2024","start":2016,"end":2024,"body":"кроссовер","segment":"SUV"},{"id":385,"brand":"Volkswagen","model":"Tiguan","generation":"3 поколение","years":"2023–н.в.","start":2023,"end":null,"body":"кроссовер","segment":"SUV"},{"id":386,"brand":"Volkswagen","model":"Touareg","generation":"1 поколение","years":"2002–2010","start":2002,"end":2010,"body":"кроссовер","segment":"SUV"},{"id":387,"brand":"Volkswagen","model":"Touareg","generation":"2 поколение","years":"2010–2018","start":2010,"end":2018,"body":"кроссовер","segment":"SUV"},{"id":388,"brand":"Volkswagen","model":"Touareg","generation":"3 поколение","years":"2018–н.в.","start":2018,"end":null,"body":"кроссовер","segment":"SUV"},{"id":389,"brand":"Volkswagen","model":"Transporter / Multivan","generation":"T5","years":"2003–2015","start":2003,"end":2015,"body":"минивэн / фургон","segment":"MPV"},{"id":390,"brand":"Volkswagen","model":"Transporter / Multivan","generation":"T6","years":"2015–2021","start":2015,"end":2021,"body":"минивэн / фургон","segment":"MPV"},{"id":391,"brand":"Volkswagen","model":"Transporter / Multivan","generation":"T6.1","years":"2019–н.в.","start":2019,"end":null,"body":"минивэн / фургон","segment":"MPV"},{"id":392,"brand":"Volvo","model":"S60","generation":"2 поколение","years":"2010–2018","start":2010,"end":2018,"body":"седан","segment":"D-класс"},{"id":393,"brand":"Volvo","model":"S60","generation":"3 поколение","years":"2018–2024","start":2018,"end":2024,"body":"седан","segment":"D-класс"},{"id":394,"brand":"Volvo","model":"S80","generation":"2 поколение","years":"2006–2016","start":2006,"end":2016,"body":"седан","segment":"E-класс"},{"id":395,"brand":"Volvo","model":"XC60","generation":"1 поколение","years":"2008–2017","start":2008,"end":2017,"body":"кроссовер","segment":"SUV"},{"id":396,"brand":"Volvo","model":"XC60","generation":"2 поколение","years":"2017–н.в.","start":2017,"end":null,"body":"кроссовер","segment":"SUV"},{"id":397,"brand":"Volvo","model":"XC90","generation":"1 поколение","years":"2002–2014","start":2002,"end":2014,"body":"кроссовер","segment":"SUV"},{"id":398,"brand":"Volvo","model":"XC90","generation":"2 поколение","years":"2015–н.в.","start":2015,"end":null,"body":"кроссовер","segment":"SUV"},{"id":399,"brand":"POER","model":"POER","generation":"1 поколение / GWM Poer","years":"2021–н.в.","start":2021,"end":null,"body":"пикап","segment":"среднеразмерный пикап"},{"id":400,"brand":"POER","model":"KINGKONG POER","generation":"1 поколение / KingKong Poer","years":"2022–н.в.","start":2022,"end":null,"body":"пикап","segment":"среднеразмерный пикап"},{"id":401,"brand":"POER","model":"POER SAHAR","generation":"1 поколение / Poer Sahar","years":"2024–н.в.","start":2024,"end":null,"body":"пикап","segment":"среднеразмерный пикап"},{"id":402,"brand":"TENET","model":"T4","generation":"1 поколение","years":"2025–н.в.","start":2025,"end":null,"body":"кроссовер","segment":"B-SUV"},{"id":403,"brand":"TENET","model":"T7","generation":"1 поколение","years":"2025–н.в.","start":2025,"end":null,"body":"кроссовер","segment":"C-SUV"},{"id":404,"brand":"TENET","model":"T8","generation":"1 поколение","years":"2025–н.в.","start":2025,"end":null,"body":"7-местный кроссовер","segment":"D-SUV"},{"id":405,"brand":"Belgee","model":"X50","generation":"1 поколение","years":"2023–н.в.","start":2023,"end":null,"body":"кроссовер","segment":"B-SUV"},{"id":406,"brand":"Belgee","model":"X50+","generation":"1 поколение","years":"2026–н.в.","start":2026,"end":null,"body":"кроссовер","segment":"B-SUV"},{"id":407,"brand":"Belgee","model":"X70","generation":"1 поколение","years":"2024–н.в.","start":2024,"end":null,"body":"кроссовер","segment":"C-SUV"},{"id":408,"brand":"Belgee","model":"S50","generation":"1 поколение","years":"2025–н.в.","start":2025,"end":null,"body":"седан","segment":"C-класс"}];
+const CURRENT_YEAR = 2026;
+
+const state = {
+  brand:"",
+  model:"",
+  year:"",
+  generationId:"",
+  matsType:"",
+  trunk:"",
+  heelPad:""
+};
+
+const steps = [
+  {
+    key:"brand",
+    title:"Выберите марку",
+    subtitle:"Сначала клиент выбирает марку автомобиля.",
+    type:"list"
+  },
+  {
+    key:"model",
+    title:"Выберите модель",
+    subtitle:"Показываются только модели выбранной марки.",
+    type:"list"
+  },
+  {
+    key:"year",
+    title:"Выберите год выпуска",
+    subtitle:"Показываются годы, которые есть в поколениях выбранной модели.",
+    type:"list"
+  },
+  {
+    key:"generationId",
+    title:"Выберите поколение",
+    subtitle:"Если по году есть пересечение поколений, выберите подходящий вариант.",
+    type:"list"
+  },
+  {
+    key:"matsType",
+    title:"Коврики с бортами или без?",
+    subtitle:"Выберите основной тип комплекта.",
+    type:"choice",
+    choices:[
+      {value:"С бортами", title:"С бортами", desc:"Борта удерживают воду, грязь и снег."},
+      {value:"Без бортов", title:"Без бортов", desc:"Классический плоский вариант EVA ковриков."}
+    ]
+  },
+  {
+    key:"trunk",
+    title:"Нужен коврик в багажник?",
+    subtitle:"Добавить коврик в багажник к комплекту?",
+    type:"choice",
+    choices:[
+      {value:"С багажником", title:"Да, с багажником", desc:"Комплект салон + багажник."},
+      {value:"Без багажника", title:"Нет, только салон", desc:"Только коврики в салон."}
+    ]
+  },
+  {
+    key:"heelPad",
+    title:"Нужен подпятник?",
+    subtitle:"Подпятник защищает место под пяткой водителя.",
+    type:"choice",
+    choices:[
+      {value:"С подпятником", title:"Да, нужен", desc:"Рекомендуется для водительского коврика."},
+      {value:"Без подпятника", title:"Нет", desc:"Оставить коврик без подпятника."}
+    ]
+  }
+];
+
+let stepIndex = 0;
+
+const $ = (id) => document.getElementById(id);
+const unique = (arr) => [...new Set(arr.filter(Boolean))];
+const sortRu = (arr) => arr.sort((a,b)=>String(a).localeCompare(String(b),"ru",{numeric:true}));
+
+function initStats(){
+  $("brandCount").textContent = unique(CARS.map(c=>c.brand)).length;
+  $("modelCount").textContent = unique(CARS.map(c=>c.brand + " " + c.model)).length;
+  $("generationCount").textContent = CARS.length;
+}
+
+function filteredCars(){
+  return CARS.filter(c => 
+    (!state.brand || c.brand === state.brand) &&
+    (!state.model || c.model === state.model)
+  );
+}
+
+function carsForYear(){
+  const y = Number(state.year);
+  return filteredCars().filter(c => {
+    const s = Number(c.start || 0);
+    const e = Number(c.end || CURRENT_YEAR);
+    return y >= s && y <= e;
+  });
+}
+
+function getOptionsForStep(key){
+  if(key === "brand"){
+    return sortRu(unique(CARS.map(c=>c.brand))).map(v=>({value:v,title:v,desc:"Марка автомобиля"}));
+  }
+  if(key === "model"){
+    return sortRu(unique(CARS.filter(c=>c.brand === state.brand).map(c=>c.model))).map(v=>({value:v,title:v,desc:state.brand}));
+  }
+  if(key === "year"){
+    let years = [];
+    filteredCars().forEach(c=>{
+      if(!c.start) return;
+      const end = c.end || CURRENT_YEAR;
+      for(let y=c.start; y<=end; y++) years.push(y);
+    });
+    return unique(years).sort((a,b)=>b-a).map(v=>({value:String(v),title:String(v),desc:"Год выпуска"}));
+  }
+  if(key === "generationId"){
+    return carsForYear().map(c=>({
+      value:String(c.id),
+      title:c.generation,
+      desc:[c.years, c.body, c.segment].filter(Boolean).join(" • ")
+    }));
+  }
+  return [];
+}
+
+function clearAfter(key){
+  const order = steps.map(s=>s.key);
+  const idx = order.indexOf(key);
+  order.slice(idx+1).forEach(k => state[k] = "");
+}
+
+function renderList(step){
+  const opts = getOptionsForStep(step.key);
+  const active = state[step.key];
+  const searchId = "searchInput";
+  if(!opts.length){
+    $("quizBody").innerHTML = '<div class="empty">Нет вариантов для выбранных параметров. Вернитесь на шаг назад и измените выбор.</div>';
+    return;
+  }
+  $("quizBody").innerHTML = `
+    <div class="search"><input id="${searchId}" placeholder="Поиск..." autocomplete="off"></div>
+    <div class="options" id="optionsBox"></div>
+    <p class="hint">Выбрано: ${active ? escapeHtml(getSelectedLabel(step.key)) : "пока ничего не выбрано"}</p>
+  `;
+  const input = $(searchId);
+  const box = $("optionsBox");
+  const draw = () => {
+    const q = input.value.trim().toLowerCase();
+    const filtered = opts.filter(o => (o.title + " " + (o.desc || "")).toLowerCase().includes(q));
+    box.innerHTML = filtered.map(o => `
+      <div class="option ${String(active)===String(o.value) ? "active":""}" data-value="${escapeAttr(o.value)}">
+        <strong>${escapeHtml(o.title)}</strong>
+        ${o.desc ? `<span>${escapeHtml(o.desc)}</span>` : ""}
+      </div>
+    `).join("") || '<div class="empty">Ничего не найдено</div>';
+    box.querySelectorAll(".option").forEach(el=>{
+      el.addEventListener("click",()=>{
+        const pageY = window.scrollY;
+        state[step.key] = el.dataset.value;
+        clearAfter(step.key);
+
+        box.querySelectorAll(".option").forEach(item => item.classList.remove("active"));
+        el.classList.add("active");
+
+        const hint = document.querySelector("#quizBody .hint");
+        if (hint) {
+          hint.textContent = `Выбрано: ${getSelectedLabel(step.key) || "пока ничего не выбрано"}`;
+        }
+
+        $("nextBtn").disabled = !state[step.key];
+
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: pageY, behavior: "auto" });
+        });
+      });
+    });
+  };
+  input.addEventListener("input", draw);
+  draw();
+}
+
+function renderChoice(step){
+  const active = state[step.key];
+  $("quizBody").innerHTML = `
+    <div class="options">
+      ${step.choices.map(o=>`
+        <div class="option big ${active===o.value ? "active":""}" data-value="${escapeAttr(o.value)}">
+          <strong>${escapeHtml(o.title)}</strong>
+          <span>${escapeHtml(o.desc)}</span>
+        </div>
+      `).join("")}
+    </div>
+    <p class="hint">Выбрано: ${active || "пока ничего не выбрано"}</p>
+  `;
+  document.querySelectorAll(".option").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const pageY = window.scrollY;
+      state[step.key] = el.dataset.value;
+
+      document.querySelectorAll(".option").forEach(item => item.classList.remove("active"));
+      el.classList.add("active");
+
+      const hint = document.querySelector("#quizBody .hint");
+      if (hint) {
+        hint.textContent = `Выбрано: ${state[step.key] || "пока ничего не выбрано"}`;
+      }
+
+      $("nextBtn").disabled = !state[step.key];
+
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: pageY, behavior: "auto" });
+      });
+    });
+  });
+}
+
+function render(){
+  const step = steps[stepIndex];
+  $("stepTitle").textContent = step.title;
+  $("stepSubtitle").textContent = step.subtitle;
+  $("progressText").textContent = `Шаг ${stepIndex + 1} из ${steps.length}`;
+  $("progressBar").style.width = `${((stepIndex + 1) / steps.length) * 100}%`;
+  $("backBtn").style.visibility = stepIndex === 0 ? "hidden" : "visible";
+  $("nextBtn").textContent = stepIndex === steps.length - 1 ? "Показать заявку" : "Далее →";
+  $("nextBtn").disabled = !state[step.key];
+
+  if(step.type === "choice") renderChoice(step);
+  else renderList(step);
+}
+
+function getSelectedCar(){
+  return CARS.find(c => String(c.id) === String(state.generationId));
+}
+
+function getSelectedLabel(key){
+  if(key === "generationId"){
+    const c = getSelectedCar();
+    return c ? `${c.generation} (${c.years})` : "";
+  }
+  return state[key] || "";
+}
+
+function showResult(){
+  const car = getSelectedCar();
+  const items = [
+    ["Марка", state.brand],
+    ["Модель", state.model],
+    ["Год выпуска", state.year],
+    ["Поколение", car ? `${car.generation} — ${car.years}` : ""],
+    ["Кузов", car ? car.body || "не указан" : ""],
+    ["Коврики", state.matsType],
+    ["Багажник", state.trunk],
+    ["Подпятник", state.heelPad]
+  ];
+  $("summary").innerHTML = items.map(([k,v])=>`
+    <div class="summary-item"><span>${escapeHtml(k)}</span><strong>${escapeHtml(v || "—")}</strong></div>
+  `).join("");
+  $("resultCard").classList.add("show");
+  $("resultCard").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function buildRequestText(){
+  const car = getSelectedCar();
+  const name = $("clientName").value.trim();
+  const phone = $("clientPhone").value.trim();
+  const messenger = $("clientMessenger").value.trim();
+  const comment = $("comment").value.trim();
+  return [
+    "Заявка на EVA коврики",
+    "",
+    `Марка: ${state.brand}`,
+    `Модель: ${state.model}`,
+    `Год: ${state.year}`,
+    `Поколение: ${car ? car.generation : ""}`,
+    `Годы поколения: ${car ? car.years : ""}`,
+    `Кузов: ${car ? car.body || "не указан" : ""}`,
+    `Коврики: ${state.matsType}`,
+    `Багажник: ${state.trunk}`,
+    `Подпятник: ${state.heelPad}`,
+    "",
+    name ? `Имя: ${name}` : "",
+    phone ? `Телефон: ${phone}` : "",
+    messenger ? `Связь: ${messenger}` : "",
+    comment ? `Комментарий: ${comment}` : ""
+  ].filter(line => line !== "").join("\n");
+}
+
+function copyRequest(){
+  navigator.clipboard.writeText(buildRequestText()).then(()=>{
+    toast("Заявка скопирована");
+  }).catch(()=>{
+    const area = document.createElement("textarea");
+    area.value = buildRequestText();
+    document.body.appendChild(area);
+    area.select();
+    document.execCommand("copy");
+    area.remove();
+    toast("Заявка скопирована");
+  });
+}
+
+function showSendStatus(type, message){
+  const box = $("sendStatus");
+  if (!box) return;
+  box.className = "send-status show " + (type || "");
+  box.textContent = message;
+}
+
+function clearSendStatus(){
+  const box = $("sendStatus");
+  if (!box) return;
+  box.className = "send-status";
+  box.textContent = "";
+}
+
+function explainSendError(response, result, rawText){
+  const serverError = result && result.error ? String(result.error) : "";
+
+  if (response && response.status === 404) {
+    return "Не найден /api/send-telegram. Проверьте, что файл api/send-telegram.js лежит в корне проекта на Vercel, затем сделайте Redeploy.";
+  }
+
+  if (response && response.status === 405) {
+    return "Метод не разрешён. Значит /api/send-telegram открылся, но запрос дошёл не как POST. Перезалейте обновлённый index.html.";
+  }
+
+  if (serverError.includes("Telegram variables are not configured")) {
+    return "В Vercel не настроены переменные TELEGRAM_BOT_TOKEN и/или TELEGRAM_CHAT_ID для текущего окружения. Добавьте их в Project → Settings → Environment Variables и сделайте Redeploy.";
+  }
+
+  if (serverError.toLowerCase().includes("chat not found")) {
+    return "Telegram ответил: chat not found. Проверьте TELEGRAM_CHAT_ID и напишите /start вашему боту от нужного аккаунта.";
+  }
+
+  if (serverError.toLowerCase().includes("unauthorized")) {
+    return "Telegram ответил: unauthorized. Проверьте TELEGRAM_BOT_TOKEN — скорее всего токен указан неверно.";
+  }
+
+  if (serverError) {
+    return serverError;
+  }
+
+  if (rawText) {
+    return "Сервер вернул не JSON. Вероятно, Vercel не развернул api-функцию или вернул HTML-страницу ошибки.";
+  }
+
+  return "Не удалось отправить заявку.";
+}
+
+async function sendToTelegram(){
+  const car = getSelectedCar();
+  const btn = $("sendTelegramBtn");
+
+  const payload = {
+    brand: state.brand,
+    model: state.model,
+    year: state.year,
+    generation: car ? `${car.generation} — ${car.years}` : "",
+    body: car ? car.body || "" : "",
+    matsType: state.matsType,
+    trunk: state.trunk,
+    heelPad: state.heelPad,
+    name: $("clientName").value.trim(),
+    phone: $("clientPhone").value.trim(),
+    messenger: $("clientMessenger").value.trim(),
+    comment: $("comment").value.trim()
+  };
+
+  clearSendStatus();
+
+  if (!payload.phone) {
+    showSendStatus("error", "Введите телефон клиента.");
+    toast("Введите телефон клиента");
+    $("clientPhone").focus();
+    return;
+  }
+
+  if (location.protocol === "file:") {
+    showSendStatus("error", "Отправка работает только на сайте, развернутом через Vercel. При открытии файла с компьютера /api/send-telegram недоступен.");
+    return;
+  }
+
+  try {
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Отправка...";
+    }
+
+    const response = await fetch("/api/send-telegram", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const contentType = response.headers.get("content-type") || "";
+    let result = {};
+    let rawText = "";
+
+    if (contentType.includes("application/json")) {
+      result = await response.json();
+    } else {
+      rawText = await response.text();
+      result = { ok: false, error: "" };
+    }
+
+    if (!response.ok || !result.ok) {
+      throw new Error(explainSendError(response, result, rawText));
+    }
+
+    showSendStatus("ok", "Заявка успешно отправлена в Telegram.");
+    toast("Заявка отправлена");
+  } catch (error) {
+    const message = error && error.message ? error.message : "Ошибка отправки";
+    showSendStatus("error", "Ошибка отправки: " + message);
+    toast("Ошибка отправки");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Отправить заявку";
+    }
+  }
+}
+
+function toast(text){
+  const t = $("toast");
+  t.textContent = text;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),1800);
+}
+
+function escapeHtml(v){
+  return String(v).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+
+function escapeAttr(v){
+  return escapeHtml(v).replace(/"/g,"&quot;");
+}
+
+$("backBtn").addEventListener("click",()=>{
+  if(stepIndex > 0){
+    stepIndex--;
+    $("resultCard").classList.remove("show");
+    render();
+  }
+});
+
+$("nextBtn").addEventListener("click",()=>{
+  const step = steps[stepIndex];
+  if(!state[step.key]) return;
+  if(stepIndex < steps.length - 1){
+    stepIndex++;
+    render();
+  }else{
+    showResult();
+  }
+});
+
+$("sendTelegramBtn").addEventListener("click",sendToTelegram);
+$("copyBtn").addEventListener("click",copyRequest);
+$("restartBtn").addEventListener("click",()=>{
+  Object.keys(state).forEach(k=>state[k]="");
+  stepIndex = 0;
+  $("resultCard").classList.remove("show");
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+
+initStats();
+render();
+</script>
+</body>
+</html>
